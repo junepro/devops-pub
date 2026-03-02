@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1. 메타데이터 저장용 데이터베이스
+  db:
+    image: postgres:15
+    container_name: mlflow_db
+    environment:
+      - POSTGRES_USER=mlflow
+      - POSTGRES_PASSWORD=mlflow
+      - POSTGRES_DB=mlflowdb
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 2. MLflow 트래킹 서버
+  mlflow:
+    #image: ghcr.io/mlflow/mlflow:latest
+    build: .
+    container_name: mlflow_server
+    ports:
+      - "7006:7006"
+    environment:
+      - BACKEND_STORE_URI=postgresql://mlflow:mlflow@db:5432/mlflowdb
+      - ARTIFACT_ROOT=/mlflow/artifacts
+    volumes:
+      - ./artifacts:/mlflow/artifacts
+    depends_on:
+      - db
+    command: >
+      mlflow server 
+      --backend-store-uri postgresql://mlflow:mlflow@db:5432/mlflowdb
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+      --port 7006

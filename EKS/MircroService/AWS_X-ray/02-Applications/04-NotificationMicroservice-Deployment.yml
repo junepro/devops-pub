@@ -26,11 +26,11 @@ spec:
             - name: AWS_MAIL_SERVER_HOST
               value: "smtp-service"
             - name: AWS_MAIL_SERVER_USERNAME
-              value: "AKIASUF7HC7SQJ6BCLVS"
+              value: ""
             - name: AWS_MAIL_SERVER_PASSWORD
-              value: "BARcmLiC68wgmhTy/cQvz/E8vFzeizGqdeASNtCs6+Nv"
+              value: ""
             - name: AWS_MAIL_SERVER_FROM_ADDRESS
-              value: "stacksimplify@gmail.com"
+              value: "''"
             - name: AWS_XRAY_TRACING_NAME 
               value: "V1-Notification-Microservice"              
             - name: AWS_XRAY_DAEMON_ADDRESS

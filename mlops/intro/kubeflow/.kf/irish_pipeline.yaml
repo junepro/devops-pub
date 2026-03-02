@@ -1,0 +1,61 @@
+# PIPELINE DEFINITION
+# Name: iris-no-artifacts-pipeline
+# Description: ML pipeline without file artifacts, returns accuracy.
+components:
+  comp-load-data:
+    executorLabel: exec-load-data
+    outputDefinitions:
+      parameters:
+        features: {parameterType: LIST}
+        labels: {parameterType: LIST}
+  comp-train-model:
+    executorLabel: exec-train-model
+    inputDefinitions:
+      parameters:
+        features: {parameterType: LIST}
+        labels: {parameterType: LIST}
+    outputDefinitions:
+      parameters:
+        accuracy: {parameterType: NUMBER_DOUBLE}
+
+deploymentSpec:
+  executors:
+    exec-load-data:
+      container:
+        image: python:3.8-slim
+        command: [sh, -c, ...] # pip install pandas scikit-learn 포함
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - load_data
+    exec-train-model:
+      container:
+        image: python:3.8-slim
+        command: [sh, -c, ...] # pip install scikit-learn 포함
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_model
+
+pipelineInfo:
+  name: iris-no-artifacts-pipeline
+root:
+  dag:
+    tasks:
+      load-data:
+        componentRef: {name: comp-load-data}
+        taskInfo: {name: load-data}
+      train-model:
+        componentRef: {name: comp-train-model}
+        dependentTasks: [load-data] # load-data가 끝나야 실행됨
+        arguments:
+          parameters:
+            features:
+              taskOutputParameterRef: {outputParameterKey: features, producerSubtaskKey: load-data}
+            labels:
+              taskOutputParameterRef: {outputParameterKey: labels, producerSubtaskKey: load-data}
+        taskInfo: {name: train-model}
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.x.x

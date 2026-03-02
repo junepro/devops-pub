@@ -1,0 +1,78 @@
+mimir:
+  multitenancy_enabled: false
+
+  structuredConfig:
+      activity_tracker:
+        filepath: /active-query-tracker/activity.log
+      
+      common:
+        storage:
+          backend: s3
+          s3:
+            endpoint: minio.monitoring.svc:9000
+            access_key_id: minio
+            secret_access_key: minio123
+            insecure: true
+            bucket_name: mimir-data
+        ingester_ring:
+          replication_factor: 1
+          kvstore:
+            store: memberlist
+      
+      blocks_storage:
+        s3:
+          bucket_name: mimir-blocks
+        tsdb:
+          dir: /data/ingester
+      
+      alertmanager_storage:
+        s3:
+          bucket_name: mimir-ruler
+
+      ingester:
+        ring:
+          replication_factor: 1
+          zone_awareness_enabled: false
+
+# [필수 설정들]
+activityTracker:
+  enabled: true
+
+ingester:
+  replicas: 1
+  zoneAwareReplication:
+    enabled: false
+
+store_gateway:
+  replicas: 1
+  zoneAwareReplication:
+    enabled: false
+
+ruler:
+  replicas: 1
+  zoneAwareReplication:
+    enabled: false
+  # [핵심] 쓰기 가능한 PVC(볼륨)를 할당하여 Read-only 에러 방지
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+
+distributor:
+  replicas: 1
+querier:
+  replicas: 1
+query_frontend:
+  replicas: 1
+compactor:
+  replicas: 1
+alertmanager:
+  replicas: 1
+query_scheduler:
+  replicas: 1  
+
+nginx:
+  enabled: true
+  fullnameOverride: mimir-gateway
+
+minio:
+  enabled: false

@@ -72,5 +72,5 @@ metadata:
 type: Opaque
 data:
   # Output of echo -n 'dbpassword11' | base64
-  db-password: ZGJwYXNzd29yZDEx
+  db-password: 
 

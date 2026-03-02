@@ -1,0 +1,18 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: intent-classifier
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: sklearn
+      ## 예시 주소
+      storageUri: "https://github.com/sample-model/model.pkl"
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "512Mi"
+        limits:
+          cpu: "1"
+          memory: "1Gi"

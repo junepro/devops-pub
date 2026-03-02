@@ -1,0 +1,37 @@
+# 'grafana:' 부모 키를 제거하고 최상위 레벨에 배치합니다.
+adminPassword: admin123
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Mimir
+        type: prometheus
+        uid: mimir
+        url: http://mimir-gateway.monitoring.svc:80/prometheus
+        access: proxy
+        isDefault: true
+        jsonData:
+          httpHeaderName1: "X-Scope-OrgID"
+          httpHeaderValue1: "anonymous"
+
+      - name: Loki
+        type: loki
+        uid: loki
+        url: http://loki-gateway.monitoring.svc:80
+        access: proxy
+
+      - name: Tempo
+        type: tempo
+        uid: tempo
+        url: http://tempo-gateway.monitoring.svc:80
+        access: proxy
+
+sidecar:
+  datasources:
+    enabled: true
+    label: grafana_datasource
+    searchNamespace: ALL
+
+service:
+  type: LoadBalancer

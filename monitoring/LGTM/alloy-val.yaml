@@ -1,0 +1,121 @@
+alloy:
+  configMap:
+    content: |
+      // 1. [Discovery] 쿠버네티스 파드 탐색
+      discovery.kubernetes "pods" {
+        role = "pod"
+      }
+
+      // 2. [Relabeling] 핵심! 발견된 파드에 네임스페이스, 앱 이름표 붙이기
+      discovery.relabel "k8s_labels" {
+        targets = discovery.kubernetes.pods.targets
+
+        // (1) 네임스페이스 (ex: monitoring)
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          action = "replace"
+          target_label = "namespace"
+        }
+
+        // (2) 파드 이름
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          action = "replace"
+          target_label = "pod"
+        }
+
+        // (3) 컨테이너 이름
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "container"
+        }
+
+        // (4) 앱 이름 (app 라벨 또는 app.kubernetes.io/name 라벨 사용)
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+          action = "replace"
+          target_label = "app"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app"]
+          action = "replace"
+          target_label = "app"
+        }
+
+        // (5) Job 이름 (namespace/app 형식으로 생성)
+        rule {
+          source_labels = ["__meta_kubernetes_namespace", "app"]
+          separator = "/"
+          action = "replace"
+          target_label = "job"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_port_number"]
+          regex         = "7946"
+          action        = "drop"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_port_number"]
+          regex         = "9092"
+          action        = "drop"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_port_number"]
+          regex         = "9093"
+          action        = "drop"
+        }        
+      }
+
+      // --- [METRICS: Mimir] ---
+      prometheus.scrape "metrics" {
+        // 수정됨: discovery.kubernetes.pods.targets -> discovery.relabel.k8s_labels.output
+        targets    = discovery.relabel.k8s_labels.output
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      prometheus.remote_write "mimir" {
+        endpoint {
+          url = "http://mimir-gateway.monitoring.svc:80/api/v1/push"
+          headers = { "X-Scope-OrgID" = "anonymous" }
+        }
+      }
+
+      // --- [LOGS: Loki] ---
+      loki.source.kubernetes "logs" {
+        // 수정됨: discovery.kubernetes.pods.targets -> discovery.relabel.k8s_labels.output
+        targets    = discovery.relabel.k8s_labels.output
+        forward_to = [loki.write.loki_backend.receiver]
+      }
+
+      loki.write "loki_backend" {
+        endpoint {
+          // Simple Scalable 모드이므로 Gateway를 통해 Write합니다.
+          url = "http://loki-gateway.monitoring.svc:80/loki/api/v1/push"
+        }
+      }
+
+      // --- [TRACES & OTLP Conversion: Tempo & Mimir] ---
+      
+      // 변환기: OTLP 메트릭 -> Prometheus 포맷
+      otelcol.exporter.prometheus "mimir_bridge" {
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      // OTLP 수신 설정
+      otelcol.receiver.otlp "default" {
+        grpc { endpoint = "0.0.0.0:4317" }
+        http { endpoint = "0.0.0.0:4318" }
+
+        output {
+          traces  = [otelcol.exporter.otlp.tempo.input]
+          metrics = [otelcol.exporter.prometheus.mimir_bridge.input]
+        }
+      }
+
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "tempo.monitoring.svc:4317"
+          tls { insecure = true }
+        }
+      }

@@ -1,0 +1,80 @@
+tempo:
+  # 1. 차트 정보
+  repository: grafana/tempo-distributed
+
+  # 2. 핵심 설정 (Kind 리소스 고려하여 최적화)
+  structuredConfig:
+    multitenancy_enabled: false
+    
+    metrics_generator:
+      registry:
+        external_labels:
+          source: tempo
+          cluster: kind-cluster
+      storage:
+        path: /var/tempo/generator/wal
+        remote_write:
+          - url: http://mimir-gateway.monitoring.svc:80/api/v1/push
+            send_exemplars: true
+
+  overrides:
+      metrics_generator_processors: [service-graphs, span-metrics]
+
+  # 3. S3 스토리지 (MinIO)
+  storage:
+    trace:
+      backend: s3
+      s3:
+        endpoint: minio.monitoring.svc:9000
+        bucket: tempo-data
+        access_key: minio
+        secret_key: minio123
+        insecure: true
+
+# --- 컴포넌트 설정 (Kind용 1 replica 고정) ---
+
+distributor:
+  replicas: 1
+
+ingester:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 1Gi  # Kind 실습용이므로 5Gi로 충분
+
+querier:
+  replicas: 1
+
+queryFrontend:
+  replicas: 1
+
+compactor:
+  replicas: 1
+
+# [중요] Service Graph 생성기
+metricsGenerator:
+  enabled: true
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 1Gi
+
+# 무거운 캐시 제거
+memcached:
+  enabled: false
+memcachedExporter:
+  enabled: false
+
+# 자체 MinIO 제거
+minio:
+  enabled: false
+
+# 게이트웨이
+gateway:
+  enabled: true
+  # Kind에서는 LoadBalancer IP가 안 나오므로 ClusterIP로 설정해도 됩니다.
+  # (LoadBalancer로 둬도 동작은 하지만 Pending 상태가 거슬린다면 변경하세요)
+  type: ClusterIP 
+
+serviceAccount:
+  create: true

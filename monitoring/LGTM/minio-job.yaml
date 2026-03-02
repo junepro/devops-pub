@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-make-buckets
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      containers:
+      - name: minio-mc
+        image: minio/mc
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            mc alias set myminio http://minio.monitoring.svc:9000 minio minio123;
+            mc mb myminio/mimir-blocks;
+            mc mb myminio/mimir-alerts;
+            mc mb myminio/mimir-ruler;
+            mc mb myminio/loki-chunks;
+            mc mb myminio/loki-ruler;
+            mc mb myminio/loki-admin;   
+            mc mb myminio/tempo-data;                    
+            exit 0;
+      restartPolicy: Never

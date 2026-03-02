@@ -22,7 +22,7 @@ metadata:
   name: mysql-credentials
 type: Opaque
 data:
-  rootpasswd: cGFzc3dvcmQ=
+  rootpasswd: 
 ---
 apiVersion: v1
 kind: Service

@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lgtm-tester-script
+  namespace: monitoring
+data:
+  app.py: |
+    import time
+    import logging
+    import os
+    from opentelemetry import trace, metrics
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.sdk.metrics import MeterProvider
+    from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+    from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
+
+    # 설정
+    SERVICE_NAME = os.getenv("OTEL_SERVICE_NAME", "lgtm-tester")
+    ALLOY_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://alloy.monitoring.svc:4317")
+
+    # 리소스 정의
+    resource = Resource.create({"service.name": SERVICE_NAME})
+
+    # 1. Trace 설정 (Tempo로 전송)
+    trace_provider = TracerProvider(resource=resource)
+    otlp_trace_exporter = OTLPSpanExporter(endpoint=ALLOY_ENDPOINT, insecure=True)
+    trace_provider.add_span_processor(BatchSpanProcessor(otlp_trace_exporter))
+    trace.set_tracer_provider(trace_provider)
+    tracer = trace.get_tracer(__name__)
+
+    # 2. Metric 설정 (Mimir로 전송)
+    otlp_metric_exporter = OTLPMetricExporter(endpoint=ALLOY_ENDPOINT, insecure=True)
+    reader = PeriodicExportingMetricReader(otlp_metric_exporter)
+    meter_provider = MeterProvider(resource=resource, metric_readers=[reader])
+    metrics.set_meter_provider(meter_provider)
+    meter = metrics.get_meter(__name__)
+    counter = meter.create_counter("lgtm_test_requests_total", description="Total test requests")
+
+    # 3. Log 설정 (stdout -> Alloy가 수집해서 Loki로 전송)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s [%(name)s] %(message)s')
+    logger = logging.getLogger("lgtm-logger")
+
+    print(f"Starting LGTM Tester... sending to {ALLOY_ENDPOINT}")
+
+    while True:
+        with tracer.start_as_current_span("process-request") as span:
+            # 트레이스에 속성 추가
+            span.set_attribute("http.method", "GET")
+            span.set_attribute("app.version", "1.0.0")
+            
+            # 메트릭 증가
+            counter.add(1, {"env": "production"})
+            
+            # 로그 출력 (TraceID를 포함하면 금상첨화지만 여기선 단순 확인)
+            trace_id = trace.format_trace_id(span.get_span_context().trace_id)
+            logger.info(f"Processing request... TraceID: {trace_id}")
+            
+            time.sleep(5)
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lgtm-tester
+  namespace: monitoring
+  labels:
+    app: lgtm-tester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lgtm-tester
+  template:
+    metadata:
+      labels:
+        app: lgtm-tester
+    spec:
+      containers:
+      - name: python-app
+        image: python:3.9-slim
+        command: ["/bin/sh", "-c"]
+        # 필요한 라이브러리 설치 후 스크립트 실행
+        args:
+          - pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp && python /app/app.py
+        env:
+          - name: OTEL_SERVICE_NAME
+            value: "lgtm-tester-app"
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://alloy.monitoring.svc:4317" # Alloy의 gRPC 포트
+        volumeMounts:
+          - name: script-volume
+            mountPath: /app
+      volumes:
+        - name: script-volume
+          configMap:
+            name: lgtm-tester-script

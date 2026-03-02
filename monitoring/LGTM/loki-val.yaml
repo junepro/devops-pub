@@ -1,0 +1,74 @@
+# 1. Loki 애플리케이션 설정
+loki:
+  # 모드 변경: SingleBinary -> SimpleScalable
+  deploymentMode: SimpleScalable
+  auth_enabled: false
+
+  commonConfig:
+    replication_factor: 1 # 리플리카가 1개이므로 복제 계수도 반드시 1이어야 합니다.
+    storage:
+      s3:
+        endpoint: http://minio.monitoring.svc:9000
+        access_key_id: minio
+        secret_access_key: minio123
+        s3_force_path_style: true
+        insecure: true
+
+  storage:
+    type: s3
+    bucketNames:
+      chunks: loki-chunks
+      ruler: loki-ruler
+      admin: loki-admin
+    s3:
+      endpoint: http://minio.monitoring.svc:9000
+      accessKeyId: minio
+      secretAccessKey: minio123
+      s3ForcePathStyle: true
+      insecure: true
+
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+
+# 2. 컴포넌트별 리플리카 설정 (최상위 레벨)
+# 각각 1개씩 생성합니다.
+
+write:
+  replicas: 1
+  persistence:
+    size: 1Gi
+
+read:
+  replicas: 1
+
+backend:
+  replicas: 1
+  persistence:
+    size: 1Gi
+
+# --- [리소스 절약] 캐시 및 카나리 끄기 ---
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+lokiCanary:
+  enabled: false
+
+# --- [에러 해결 핵심] 카나리를 껐으므로 테스트 기능도 끕니다 ---
+test:
+  enabled: false
+
+# 게이트웨이 (입구 역할)
+gateway:
+  enabled: true
+
+# MinIO (외부 사용)
+minio:
+  enabled: false

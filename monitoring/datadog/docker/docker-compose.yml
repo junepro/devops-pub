@@ -1,0 +1,18 @@
+version: '3'
+services:
+  datadog:
+    image: 'datadog/agent:7.31.1'
+    env_file:
+      - .env
+    environment:
+      - DD_HOSTNAME=demo-host      
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_TAGS='dd-agent1:value1' 'dd-agent2:value2'      
+      - DD_DOCKER_LABELS_AS_TAGS={"my.custom.label.team":"alpha_team"}
+      
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+  redis:
+    image: 'redis:latest'

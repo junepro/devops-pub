@@ -28,4 +28,4 @@ spec:
             - name: AWS_MAIL_SERVER_PASSWORD
               value: "BARcmhTy/cQvz/E8vFzeizGqdeA+Nv"
             - name: AWS_MAIL_SERVER_FROM_ADDRESS
-              value: "stacksimplify@gmail.com"
+              value: "''"

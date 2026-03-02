@@ -1,0 +1,85 @@
+# PIPELINE DEFINITION
+# Name: hello-world-pipeline
+# Description: A basic pipeline that prints a greeting.
+# Inputs:
+#    recipient: str [Default: 'World']
+# Outputs:
+#    Output: str
+components:
+  comp-say-hello:
+    executorLabel: exec-say-hello
+    inputDefinitions:
+      parameters:
+        name:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-say-hello:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - say_hello
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m urllib.request --silent https://bootstrap.pypa.io/get-pip.py\
+          \ | python3 -\nfi\n\npip install --quiet --no-cache-dir 'kfp==2.x.x' &&\
+          \ \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)/main.py
+
+          printf "%s" "$0" > "$program_path"
+
+          python3 -u "$program_path" "$@"
+
+          '
+        - "def say_hello(name: str) -> str:\n    \"\"\"A simple component that says\
+          \ hello to a given name.\"\"\"\n    hello_text = f''Hello, {name}!''\n \
+          \   print(hello_text)\n    return hello_text\n\nimport argparse\nimport\
+          \ json\nimport os\nimport sys\nfrom kfp import dsl\nfrom kfp.dsl import\
+          \ *\nfrom typing import *\n\ndef _serialize_str(val: str) -> str:\n    if\
+          \ not isinstance(val, str):\n        raise TypeError(f\"Expected str, got\
+          \ {type(val)}.\")\n    return val\n\n# ... (내부 실행 로직 생략) ..."
+        image: python:3.7
+pipelineInfo:
+  description: A basic pipeline that prints a greeting.
+  name: hello-world-pipeline
+root:
+  dag:
+    outputs:
+      parameters:
+        Output:
+          valueFromParameter:
+            outputParameterKey: Output
+            producerSubtaskKey: say-hello
+    tasks:
+      say-hello:
+        arguments:
+          parameters:
+            name:
+              runtimeValue:
+                readOnlyKey: recipient
+        componentRef:
+          name: comp-say-hello
+        taskInfo:
+          name: say-hello
+  inputDefinitions:
+    parameters:
+      recipient:
+        defaultValue: World
+        isOptional: true
+        parameterType: STRING
+  outputDefinitions:
+    parameters:
+      Output:
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.x.x
