@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-v1
+  labels:
+    app: hello
+    version: v1
+spec:
+  containers:
+    - name: hello-v1
+      image: sysnet4admin/hello:v1
+      imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-v2
+  labels:
+    app: hello
+    version: v2
+spec:
+  containers:
+    - name: hello-v2
+      image: sysnet4admin/hello:v2
+      imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: net
+  labels:
+    app: net
+    version: net
+spec:
+  containers:
+    - name: net
+      image: sysnet4admin/net-tools-ifn
+      imagePullPolicy: IfNotPresent
+
+---

@@ -1,0 +1,11 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: hello-dr-rr
+spec:
+  host: "hello-svc.default.svc.cluster.local"
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        useSourceIp: true
+        #maglev:

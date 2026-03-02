@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: track-git
+  namespace: argocd
+spec:
+  destination:
+    namespace: track-git-tag
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    path: guestbook
+    repoURL: "https://github.com/mabusaa/argocd-example-apps.git"
+    ## tag 설정
+    targetRevision: v1
+
+    ### HEAD
+    #targetRevision: HEAD
+    ###
+
+    ### SHA
+    #targetRevision: 2455bb6
+    directory:
+      recurse: true
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true

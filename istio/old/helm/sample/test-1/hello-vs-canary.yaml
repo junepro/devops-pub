@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: hello-vs-canary
+spec:
+  hosts:
+    - "hello-svc.default.svc.cluster.local"
+  http:
+    - route:
+        - destination:
+            host: "hello-svc-v1.default.svc.cluster.local"
+          weight: 90
+    - route:
+        - destination:
+            host: "hello-svc-v2.default.svc.cluster.local"
+          weight: 10
+

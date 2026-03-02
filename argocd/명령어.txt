@@ -1,0 +1,22 @@
+#app 조회
+argocd app list
+
+#app 추가
+argocd app create app-2 --repo https://github.com/mabusaa/argocd-example-apps.git
+--revision master --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace app-2 --sync-option CreateNamespace=true
+
+#sync
+argocd app sync app-2
+
+#
+
+kubectl get appproject -n argocd
+
+kubectl get application -n argocd
+
+
+# role token 생성
+
+argocd proj role create-token project-with-role ci-role
+
+argocd app delete guestbook-dev-project --auth-token (위에 만든 토큰값)

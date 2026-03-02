@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: multi-sources
+  namespace: argocd
+spec:
+  destination:
+    namespace: kustomize-app
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    - chart: ingress-nginx
+      repoURL: "https://kubernetes.github.io/ingress-nginx"
+      targetRevision: latest
+      helm:
+        valuesFiles:
+          - $values/ingress-nginx/values.yaml
+    - repoUrl: "https://github.com/argoproj/argocd-example-apps.git"
+      ref: values
+      targetRevision: master
+

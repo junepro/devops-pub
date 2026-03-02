@@ -1,0 +1,23 @@
+/study/devops/istio
+
+kubectl apply -f ./new/samples/bookinfo/platform/kube/bookinfo.yaml -n dev
+
+1. Gateway API CRD 설치 (필수)
+먼저 쿠버네티스 표준 Gateway API 리소스 정의(CRD)를 클러스터에 주입해야 합니다. 아래 명령어를 실행하세요.
+
+Bash
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.2.0" | kubectl apply -f -
+참고: v1.2.0은 현재 가장 안정적인 버전 중 하나입니다.
+
+2. 설치 확인
+설치가 성공했다면 아래 명령어를 입력했을 때 리스트가 출력되어야 합니다.
+
+Bash
+kubectl get crd | grep gateway.networking.k8s.io
+
+kubectl get httproute
+
+kubectl get gateway
+
+kubectl port-forward svc/istio-ingress 8080:80
+

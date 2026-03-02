@@ -1,0 +1,59 @@
+시작 하기 전
+
+npm install -g serverless@3.39.0 # 또는 안정적인 v3 버전으로 설치
+serverless --version
+
+serverless config
+
+serverless config credentials --provider aws --key access_key --secret secret_key --profile serverless serverless-admin
+
+
+serverless create --template google-python --path hello-world-gpython
+
+설정 변경 후 배포
+serverless deploy --verbose
+
+빠른 배포
+serverless deploy function -f hello  (함수 이름 )
+
+함수실행
+serverless invoke --function hello --log
+
+serverless logs -f hello 
+
+설정 정리
+serverless remove
+
+
+
+serverless create --template aws-python3 --path python-example
+
+
+sam 설치 후
+
+
+sam init
+
+sam build
+
+[*] Validate SAM template: sam validate
+[*] Invoke Function: sam local invoke  or sam local start-api -p 8083
+[*] Test Function in the Cloud: sam sync --stack-name {{stack-name}} --watch
+[*] Deploy: sam deploy --guided
+
+
+sam local invoke "HelloWorldFunction" -e events/event.json
+
+aws cloudformation delete-stack --stack-name sam-app --region ap-northeast-2
+
+
+vs code 상단에서 
+
+> create > stepFunction 
+
+> publish > stepFunction > ap-northeast-2 > quck create > VSStateMachine
+
+
+serverless.yml 
+function 에서
+  http: 설정 들어가면 apiGateway로 인식 

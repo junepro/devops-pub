@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: bookinfo-redis
+spec:
+  host: "redis.default.svc.cluster.local"
+  trafficPolicy:
+    connectionPool:               # 접속 pool 사이즈 조정
+      Tcp:                        # tcp or http
+        maxConnections: 100       # tcp 최대 접속 수
+        connectTimeout: 30ms      # tcp timeout
+
+    outlierDetection:             # 서킷 브레이커 동작 조건 나열
+      consecutiveErrors: 3        # 3번이 넘어가지는지 체크
+      interval: 30s               # 3번의 문제가 얼마의 기간 동안 발생하는지 체크
+      baseEjectionTime: 30m       # 얼마나 오랫동안 접속이 안되도록 할 것인가 설정
+      maxEjectionPercent: 50      # 완전히 서비스 중단 하는게 아니고 50% 정도만 놔두고 설정
+

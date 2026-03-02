@@ -1,0 +1,77 @@
+https://istio.io/latest/docs/setup/install/helm  설치 주소
+
+helm repo add istio https://istio-release.storage.googleapis.com/charts
+
+helm repo update
+
+kubectl create ns  istio-system
+
+helm install istio-base istio/base -n istio-system --set defaultRevision=default
+
+helm install istiod istio/istiod -n istio-system --set profile=demo --wait
+
+kubectl label namespace nginx istio-injection=enabled
+
+kubectl create namespace istio-ingress
+
+helm install istio-ingress istio/gateway -n istio-system
+
+
+helm ls -n istio-system
+
+kubectl create namespace nginx
+
+kubectl apply -f .\http-gateway
+
+kubectl apply -f .\nginx.yaml
+
+kubectl apply -f .\nginx-service.yaml
+
+
+minikube service istio-ingressgateway  -n istio-system --url
+
+minikube tunnel < loadbalancer pending 해결
+
+### istioctl 로 설치
+## istioctl install --set profile=default -y --set meshConfig.enableTracing=true
+
+
+##참고
+https://nginxstore.com/blog/istio/kiali-%EB%B0%8F-prometheus%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-istio-service-mesh-%EC%8B%9C%EA%B0%81%ED%99%94-%EB%B0%A9%EB%B2%95/
+
+https://github.com/istio/istio/releases/tag/1.24.1
+에서 코드집 받은 후  samples / addons / 파일 받은 후   yaml 복사
+
+grafana , kiali , prometheus , 등등
+
+설치
+
+jager > tracing svc 가 UI
+
+minikube service istio-ingressgateway  -n istio-system --url
+minikube service kiali  -n istio-system --url
+minikube service tracing  -n istio-system --url
+
+전부 설치  후
+
+sample > bookinfo project  설치
+
+kubectl apply -f sample/bookinfo/platform/kube/bookinfo.yaml
+
+kubectl apply -f sample/bookinfo/networking/bookinfo-gateway.yaml
+
+bookinfo gateway 설치 에러시 api crd 설치해야됨
+
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.2.0" | kubectl apply -f -;
+
+minikube service tracing   --url
+
+Set-Alais k   kubectl
+
+부하발생
+
+https://github.com/sysnet4admin/_Lecture_k8s_learning.kit/blob/main/A/
+
+for i in $(seq 1 100); do curl -s -o /dev/null "http://$INGRESS_HOST/productpage"; done
+
+for i in $(seq 1 100); do curl -s -o /dev/null "http://127.0.0.1:4455/productpage"; done

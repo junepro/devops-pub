@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-svc-v1
+spec:
+  selector:
+    app: hello
+    version: v1
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-svc-v2
+spec:
+  selector:
+    app: hello
+    version: v2
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-svc
+  labels:
+    app: hello
+spec:
+  selector:
+    app: hello
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset
+  labels:
+    app: statefulset
+spec:
+  replicas: 3
+  serviceName: statefulset-service
+  selector:
+    matchLabels:
+      app: statefulset
+  template:
+    metadata:
+      name: statefulset
+      labels:
+        app: statefulset
+  podManagementPolicy: Parallel
+  volumeClaimTemplate:
+    - metadata:
+        name: data-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: google-storage
+        resource:
+          requests:
+            storage: 500Mi
+      

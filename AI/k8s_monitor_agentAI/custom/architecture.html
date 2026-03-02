@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>K8s MCP Slack Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 40px; }
+  h1 { text-align: center; font-size: 24px; color: #7dd3fc; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #94a3b8; margin-bottom: 40px; font-size: 14px; }
+
+  .arch { display: flex; gap: 20px; align-items: stretch; justify-content: center; flex-wrap: wrap; }
+
+  .layer {
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 160px;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .layer h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    border-bottom: 1px solid #2d3748;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+
+  .box {
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .box-blue { background: #1e3a5f; border: 1px solid #3b82f6; color: #93c5fd; }
+  .box-green { background: #14532d; border: 1px solid #22c55e; color: #86efac; }
+  .box-purple { background: #3b1f6b; border: 1px solid #a855f7; color: #d8b4fe; }
+  .box-orange { background: #431407; border: 1px solid #f97316; color: #fdba74; }
+  .box-teal { background: #134e4a; border: 1px solid #14b8a6; color: #5eead4; }
+  .box-red { background: #450a0a; border: 1px solid #ef4444; color: #fca5a5; }
+
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: #475569;
+    font-size: 20px;
+    padding: 0 5px;
+    align-self: center;
+  }
+
+  .arrow-label { font-size: 10px; color: #64748b; text-align: center; margin-top: 4px; }
+
+  .flow-section {
+    margin-top: 40px;
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .flow-section h2 { color: #7dd3fc; margin-bottom: 16px; font-size: 16px; }
+
+  .flow-steps {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .step {
+    background: #0f1117;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .step .num { font-size: 10px; color: #64748b; margin-bottom: 4px; }
+  .step .label { color: #e2e8f0; font-weight: 600; }
+  .step .desc { color: #94a3b8; font-size: 10px; margin-top: 2px; }
+
+  .arrow-small { color: #374151; font-size: 16px; }
+
+  .tech-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .tech-card {
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .tech-card h4 { font-size: 12px; color: #7dd3fc; margin-bottom: 8px; }
+  .tech-card ul { list-style: none; }
+  .tech-card li { font-size: 11px; color: #94a3b8; padding: 2px 0; }
+  .tech-card li::before { content: "▸ "; color: #475569; }
+</style>
+</head>
+<body>
+
+<h1>🚀 K8s MCP + OpenAI + Slack DevOps Automation</h1>
+<p class="subtitle">kind 클러스터 문제 자동 감지 → AI 분석 → Slack 인터랙티브 액션</p>
+
+<div class="arch">
+  <div class="layer">
+    <h3>🖥️ Kind Cluster</h3>
+    <div class="box box-teal">Pod Events</div>
+    <div class="box box-teal">Node Status</div>
+    <div class="box box-teal">Deployments</div>
+    <div class="box box-teal">Services</div>
+    <div class="box box-teal">PVC / Logs</div>
+  </div>
+
+  <div class="arrow-row">
+    ↔️
+    <div class="arrow-label">kubectl<br>/k8s API</div>
+  </div>
+
+  <div class="layer">
+    <h3>🔧 MCP Server</h3>
+    <div class="box box-blue">get_pods</div>
+    <div class="box box-blue">get_events</div>
+    <div class="box box-blue">get_logs</div>
+    <div class="box box-blue">get_nodes</div>
+    <div class="box box-blue">exec_command</div>
+    <div class="box box-blue">restart_pod</div>
+    <div class="box box-blue">scale_deploy</div>
+  </div>
+
+  <div class="arrow-row">
+    →
+    <div class="arrow-label">MCP<br>Protocol</div>
+  </div>
+
+  <div class="layer">
+    <h3>🤖 AI Agent</h3>
+    <div class="box box-purple">OpenAI SDK</div>
+    <div class="box box-purple">Tool Calling</div>
+    <div class="box box-purple">Problem<br>Analysis</div>
+    <div class="box box-purple">Fix<br>Suggestion</div>
+  </div>
+
+  <div class="arrow-row">
+    →
+    <div class="arrow-label">Slack<br>API</div>
+  </div>
+
+  <div class="layer">
+    <h3>💬 Slack</h3>
+    <div class="box box-green">Alert<br>Message</div>
+    <div class="box box-green">Fix Button</div>
+    <div class="box box-green">Ignore<br>Button</div>
+    <div class="box box-green">Action<br>Result</div>
+  </div>
+
+  <div class="arrow-row">
+    ↔️
+    <div class="arrow-label">Webhook<br>Callback</div>
+  </div>
+
+  <div class="layer">
+    <h3>⚡ Action Handler</h3>
+    <div class="box box-orange">Slack Bolt</div>
+    <div class="box box-orange">Button<br>Events</div>
+    <div class="box box-orange">MCP Tool<br>Executor</div>
+    <div class="box box-orange">Result<br>Reporter</div>
+  </div>
+</div>
+
+<div class="flow-section">
+  <h2>📋 실행 흐름 (Flow)</h2>
+  <div class="flow-steps">
+    <div class="step">
+      <div class="num">①</div>
+      <div class="label">Watcher</div>
+      <div class="desc">K8s 이벤트 폴링 (30s)</div>
+    </div>
+    <span class="arrow-small">→</span>
+    <div class="step">
+      <div class="num">②</div>
+      <div class="label">MCP Tools</div>
+      <div class="desc">pods/events/logs 수집</div>
+    </div>
+    <span class="arrow-small">→</span>
+    <div class="step">
+      <div class="num">③</div>
+      <div class="label">OpenAI Agent</div>
+      <div class="desc">문제 감지 & 원인 분석</div>
+    </div>
+    <span class="arrow-small">→</span>
+    <div class="step">
+      <div class="num">④</div>
+      <div class="label">Slack 알림</div>
+      <div class="desc">문제 설명 + 액션 버튼</div>
+    </div>
+    <span class="arrow-small">→</span>
+    <div class="step">
+      <div class="num">⑤</div>
+      <div class="label">사용자 클릭</div>
+      <div class="desc">Fix / Ignore 버튼</div>
+    </div>
+    <span class="arrow-small">→</span>
+    <div class="step">
+      <div class="num">⑥</div>
+      <div class="label">MCP 실행</div>
+      <div class="desc">실제 수정 명령 실행</div>
+    </div>
+    <span class="arrow-small">→</span>
+    <div class="step">
+      <div class="num">⑦</div>
+      <div class="label">결과 업데이트</div>
+      <div class="desc">Slack 메시지 업데이트</div>
+    </div>
+  </div>
+</div>
+
+<div class="tech-grid">
+  <div class="tech-card">
+    <h4>🔧 MCP Server (mcp_server/)</h4>
+    <ul>
+      <li>Python + mcp SDK</li>
+      <li>kubernetes client</li>
+      <li>7가지 K8s 도구 제공</li>
+      <li>stdio transport</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>🤖 AI Agent (agent/)</h4>
+    <ul>
+      <li>OpenAI SDK (gpt-4o)</li>
+      <li>MCP Tool Calling</li>
+      <li>문제 감지 & 분석</li>
+      <li>수정 방법 제안</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>💬 Slack App (slack_app/)</h4>
+    <ul>
+      <li>Slack Bolt (Python)</li>
+      <li>Interactive Buttons</li>
+      <li>Block Kit UI</li>
+      <li>Action Webhook Handler</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>⚙️ 설정 필요</h4>
+    <ul>
+      <li>OPENAI_API_KEY</li>
+      <li>SLACK_BOT_TOKEN</li>
+      <li>SLACK_SIGNING_SECRET</li>
+      <li>SLACK_CHANNEL_ID</li>
+      <li>KUBECONFIG (~/.kube/config)</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

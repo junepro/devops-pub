@@ -1,0 +1,25 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eksdemo1  # Name of the EKS Cluster
+  region: us-east-1
+fargateProfiles:
+  - name: fp-app2
+    selectors:
+      # All workloads in the "ns-app2" Kubernetes namespace will be
+      # scheduled onto Fargate:
+      - namespace: ns-app2
+  - name: fp-ums
+    selectors:
+      # All workloads in the "ns-ums" Kubernetes namespace matching the following
+      # label selectors will be scheduled onto Fargate:
+      - namespace: ns-ums
+        labels:
+          runon: fargate
+
+# Get list of Fargate Profiles in a cluster
+# eksctl get fargateprofile --cluster eksdemo1
+
+#삭제시
+#eksctl delete fargateprofile --cluster eksdemo1 --name fp-app2 --wait
+#eksctl delete fargateprofile --cluster eksdemo1 --name fp-ums --wait

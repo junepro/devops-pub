@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: multi-sources
+  namespace: argocd
+spec:
+  destination:
+    namespace: kustomize-app
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    - chart: redis
+      repoURL: "https://chars.bitnami.com/bitnami"
+      targetRevision: latest
+    - chart: prometheus-redis-exporter
+      repoUrl: "https://prometheus-community.github.io/helm-charts"
+      targetRevision: latest
+

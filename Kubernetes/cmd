@@ -1,0 +1,68 @@
+kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
+
+kubectl create deployment --image=nginx nginx --dry-run -o yaml
+
+kubectl scale deployment nginx --replicas=4
+
+kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o yaml
+
+kubectl run pod redis --port 6379 --expose true
+
+kubectl expose pod nginx --port=80 target-port=30080 --name nginx-service --type=NodePort --dry-run=client -o yaml
+
+kubectl replace --force -f <file-to-path>
+
+kubectl get pod ex -o yaml > pod.yaml
+
+** configmap
+
+    kubectl create configmap <config-name> --from-literal=<key>=<value>
+
+    kubectl create configmap app-config --from-literal=APP_COLOR=blue
+
+    kubectl create --from-file=<path-to-file>
+
+    kubectl create --from-file=app_config.properties
+
+** secret
+
+    kubectl create secret generic <secret-name> --from-literal=<key>=<value>
+
+    kubectl create secret generic app-secret --from-literal=DB_Host=mysql
+
+    kubectl create secret generic <secret-name> --from-file=<path-to-file>
+
+    kubectl create secret generic app-secret --from-file=app_secret.properties
+
+** taint
+
+    kubectl taint nodes node1 key=value:NoSchedule
+
+** label
+    kubectl label nodes node1 key=value
+
+    kubectl get pod --selector key=value
+
+** deploy policy
+
+    kubectl rollout undo deploy/myapp
+
+** deploy image
+
+    kubectl set image deploy frontend app2=cloud/app2:v2
+
+** kubectl config use-context context-name
+
+
+** kubectl get pod --as dev-user  ## role
+
+** kubectl create role dev --verb=list,create,delete resources=pods
+
+** kubectl create rolebinding dev-user-binding --role=dev --user=dev-user
+
+** namespace  not found  즉 생성 되지 않은 경우에
+   생성 명령 시 자동 provision 되게 하는 방법
+
+ kube-apiserver /etc/kubernetes/manifests/kube-apiserver.yaml
+
+ 에서 command > --enable-admission-plugins=NodeNamespaceAutoProvision 설정 추가

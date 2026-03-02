@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job
+spec:
+  completions: 3 # 갯수
+  parallelism: 3 # 병렬
+  template:
+    spec:
+      containers:
+        - name: job
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - date; echo Hello!
+      restartPolicy: Never
+  backoffLimit: 25

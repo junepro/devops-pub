@@ -1,0 +1,38 @@
+# This will enforce that ONLY traffic that is TLS is allowed between proxies
+apiVersion: "security.istio.io/v1beta1"
+kind: "PeerAuthentication"
+metadata:
+  name: "default"
+  namespace: "istio-system"
+spec:
+  mtls:
+    mode: STRICT
+
+# 서비스 메시 내의 모든 통신을 반드시 암호화하도록 강제하는 "보안 잠금 장치"입니다.
+
+# 동작 방식: 메시 내의 서비스로 들어오는 모든 요청을 검사합니다.
+
+# STRICT 모드: 호출하는 쪽에서 유효한 인증서(mTLS)를 가지고 있지 않으면, 아예 연결을 거부합니다. 즉, 일반적인 HTTP 통신(Plain Text)은 차단됩니다.
+
+# 범위: namespace: istio-system에 설정하셨으므로, 클러스터 내의 모든 네임스페이스에 이 보안 규칙이 전역적으로 적용됩니다
+
+# 1. STRICT (엄격 모드)
+# 작동: 반드시 유효한 클라이언트 인증서가 있어야 통신이 가능합니다.
+
+# 효과: 사이드카 프록시가 없는 서비스에서 오는 요청은 모두 차단됩니다.
+
+# 권장: 보안이 중요한 운영(Production) 환경의 최종 설정.
+
+# 2. PERMISSIVE (허용 모드)
+# 작동: 암호화된 요청은 암호화된 채로 받고, 암호화되지 않은 요청도 받아줍니다.
+
+# 효과: 서비스들을 하나씩 Istio mesh에 추가할 때, 통신이 끊기지 않게 해주는 "완충지대" 역할을 합니다.
+
+# 권장: Istio 도입 초기 또는 대규모 업데이트 시.
+
+# 3. DISABLE (비활성 모드)
+# 작동: mTLS 암호화를 사용하지 않습니다.
+
+# 효과: 통신 오버헤드는 줄어들지만, 데이터가 평문으로 전송되어 보안에 취약합니다.
+
+# 권장: 내부망에서 보안보다 성능이 극단적으로 중요할 때만 사용.

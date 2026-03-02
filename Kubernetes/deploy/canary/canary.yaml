@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-primary
+  labels:
+    app: myapp-primary
+spec:
+############################
+  replicas: 5
+############################
+  selector:
+    matchLabels:
+      app: myapp-primary
+  template:
+    metadata:
+      name: myapp-primary
+      labels:
+############################
+        version: v1
+        app: myapp-primary
+############################
+    spec:
+      containers:
+        - name: myapp-primary
+          image: nginx
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-canary
+  labels:
+    app: myapp-canary
+spec:
+############################개수 1개로 줄이고 모니터링
+  replicas: 1
+############################
+  selector:
+    matchLabels:
+      app: myapp-canary
+  template:
+    metadata:
+      name: myapp-canary
+      labels:
+############################       여기 부분 v2 변경
+        version: v2
+        app: myapp-canary
+############################
+    spec:
+      containers:
+        - name: myapp-canary
+          image: nginx
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: myapp-canary

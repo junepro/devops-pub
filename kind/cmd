@@ -1,0 +1,15 @@
+kind create cluster --config kind-config.yaml --name my-k8s
+
+kind delete cluster --name my-k8s
+
+
+
+
+metrics metrics-server
+
+
+# 수정된 설정 적용 (인증서 무시 옵션 포함)
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Deployment 직접 수정 (args에 옵션 강제 주입)
+kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'

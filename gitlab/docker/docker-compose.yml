@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    hostname: 'localhost'
+    environment:
+#      GITLAB_OMNIBUS_CONFIG: |
+#        external_url 'https://localhost:8080'
+#        gitlab_rails['gitlab_shell_ssh_port'] = 58022
+#        # Add any other gitlab.rb configuration here, each on its own line
+      TZ: 'Asia/Seoul'
+    ports:
+      - "443:443"
+      - "80:80"
+      - "8022:22"
+    volumes:
+      - './config:/etc/gitlab'
+      - './logs:/var/log/gitlab'
+      - './data:/var/opt/gitlab'

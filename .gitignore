@@ -1,0 +1,6 @@
+AI/k8s_monitor_agentAI/mcp_project/mcp_eks/slack_app
+AI/k8s_monitor_agentAI/mcp_project/mcp_eks/agent/commander.py
+AI/k8s_monitor_agentAI/mcp_project/mcp_eks/agent/eks_auth.py
+AI/k8s_monitor_agentAI/mcp_project/mcp_eks/agent/monitor.py
+cmd.txt
+leak_report.json

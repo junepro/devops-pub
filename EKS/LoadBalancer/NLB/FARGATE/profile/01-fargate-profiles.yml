@@ -1,0 +1,11 @@
+# Create Fargate Profile
+# eksctl create fargateprofile -f fargate-profile/01-fargate-profiles.yml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eksdemo1  # Name of the EKS Cluster
+  region: us-east-1
+fargateProfiles:
+  - name: fp-app3
+    selectors:
+      - namespace: ns-app3

@@ -1,0 +1,19 @@
+
+#도커 네트워크 설정 아래 에러 발생 때문에
+ERROR: Verifying runner... failed                   runner=t1_yi6s1C status=couldn't execute POST against http://localhost/ap
+i/v4/runners/verify: Post "http://localhost/api/v4/runners/verify": dial tcp 127.0.0.1:80: connect: connection refused
+PANIC: Failed to verify the runner.
+
+
+
+docker network create gitlab-network
+docker network connect gitlab-network gitlab
+docker network connect gitlab-network gitlab-runner
+
+
+## 도커에서 띄웠을 경우
+
+gitlab-runner register  --url http://gitlab  --token glrt-t1_yi6s1Cf-5gU9NWeE86yd
+                              이부분 도커 네임으로 지정해줘야됨 localhost 하면안됨
+
+##

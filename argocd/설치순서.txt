@@ -1,0 +1,29 @@
+# namespace 생성
+$ kubectl create namespace argocd
+
+# argocd 리소스 추가
+$ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+
+# 초기 비밀 번호
+$ kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+# argocd container 접속 후
+kubectl exec -it argocd-server-5f6567647b-77v5x bash -n argocd
+ argocd login localhost:8080 --insecure
+
+# 초기 비번 변경
+argocd account update-password
+
+# 대시보드 연결
+#kubectl port-forward --address=0.0.0.0 svc/argocd-server -n argocd 8080:443
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+
+# minikube svc 주소 확인
+minikube service argocd-server -n argocd --url
+
+# 강의 깃주소
+https://github.com/mabusaa/argocd-course-apps-definitions/tree/main/applications%20and%20projects
+
+https://github.com/mabusaa/argocd-example-apps/tree/master

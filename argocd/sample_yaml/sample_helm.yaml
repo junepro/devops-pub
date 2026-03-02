@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: helm-app
+  namespace: argocd
+spec:
+  destination:
+    namespace: helm-app
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    path: helm-guestbook
+    repoURL: "https://github.com/mabusaa/argocd-example-apps.git"
+    targetRevision: master
+    helm:
+      releaseName: my-release
+      parameters:
+        - name: "service.type"
+          value: "LoadBalancer"
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+

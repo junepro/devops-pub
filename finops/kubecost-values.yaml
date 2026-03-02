@@ -1,0 +1,39 @@
+# 1. IAM Role 연동 (IRSA)
+
+serviceAccount:
+  create: true
+  annotations:
+    # 생성하신 IAM Role ARN으로 변경하세요
+    eks.amazonaws.com/role-arn: "arn:aws:iam:::role/KubecostPricingRole"
+
+
+
+# 2. 네트워크 비용 모니터링 활성화 (서브넷 간 통신 등)
+
+networkCosts:
+  enabled: true
+  # 네트워크 트래픽 데이터를 수집하는 환경 설정
+  prometheus:
+    enabled: true
+
+
+
+# 3. 데이터 보존 설정 (EBS 사용 시 권장)
+
+# 기본적으로 32GB 정도의 볼륨을 생성하여 데이터를 보관합니다.
+
+prometheus:
+  server:
+    persistentVolume:
+      size: 10Gi
+      storageClassName: "gp3" # 환경에 맞는 스토리지 클래스 지정 가능
+
+
+
+# 4. EKS 최적화 설정 포함
+
+# (기본 values-eks-cost-monitoring.yaml의 핵심 내용 반영)
+
+kubecostProductConfigs:
+  clusterName: "dev" # 본인의 클러스터 이름으로 변경
+  awsRegion: "ap-northeast-2"   # 서울 리전 설정 (필수 추가)

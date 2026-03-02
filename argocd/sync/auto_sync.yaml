@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: auto-sync-app
+  namespace: argocd
+spec:
+  destination:
+    namespace: auto-sync-app
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    path: guestbook-with-sub-directories
+    repoURL: "https://github.com/mabusaa/argocd-example-apps.git"
+    targetRevision: master
+    directory:
+      recurse: true
+  ###sync 부분
+  syncPolicy:
+    automated: {}
+
+#    prune 설정  repo에서 삭제 된 경우 k8s 자동삭제 설정
+#    automated:
+#      prune: true
+
+#    self-heal   git 설정된 값으로 싱크 맞춰주는 역할 replicas 설정 후
+#    automated:
+#      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      #
+      # - Validate=false  검증성 무시 설정
+      # - PruneLast=true ....
+      # - ApplyOutOfSyncOnly=true # selecttive sync
+

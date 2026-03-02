@@ -1,0 +1,60 @@
+# 1. 인프라 계층: Gateway (기존 Istio Gateway 대체)
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: fleetman-gateway
+  namespace: istio-system
+spec:
+  gatewayClassName: istio # Istio 컨트롤러가 이 설정을 처리하도록 지정
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+# 2. 애플리케이션 계층: HTTPRoute (기존 VirtualService 대체)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: fleetman-webapp-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: fleetman-gateway
+      namespace: istio-system
+  hostnames:
+    - "fleetman.com"
+    - "*.fleetman.com"
+    - "experimental.fleetman.com"
+  rules:
+    # Experimental 호스트를 위한 규칙
+    - matches:
+        - headers:
+            - name: ":authority" # 혹은 호스트 헤더 기반 매칭
+              value: "experimental.fleetman.com"
+      backendRefs:
+        - name: fleetman-webapp
+          port: 80
+          filters:
+            - type: ExtensionRef # 필요시 Subset(Service 변형) 연결
+---
+# 3. 트래픽 정책: DestinationRule (동일하지만 mTLS 추가 권장)
+kind: DestinationRule
+apiVersion: networking.istio.io/v1beta1
+metadata:
+  name: fleetman-webapp
+  namespace: default
+spec:
+  host: fleetman-webapp
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL # 최신 보안 경향: 명시적 mTLS 선언
+  subsets:
+    - labels:
+        version: original
+      name: original
+    - labels:
+        version: experimental
+      name: experimental

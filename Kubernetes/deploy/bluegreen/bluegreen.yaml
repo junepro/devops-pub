@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-bluegreen
+  labels:
+    app: myapp-bluegreen
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: myapp-bluegreen
+  template:
+    metadata:
+      name: myapp-bluegreen
+      labels:
+############################
+        version: v1
+        app: myapp-bluegreen
+############################
+    spec:
+      containers:
+        - name: myapp-bluegreen
+          image: nginx
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-bluegreen
+  labels:
+    app: myapp-bluegreen
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: myapp-bluegreen
+  template:
+    metadata:
+      name: myapp-bluegreen
+      labels:
+############################       
+        version: v2
+        app: myapp-bluegreen
+############################
+    spec:
+      containers:
+        - name: myapp-bluegreen
+          image: nginx
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+########################## v1 > v2 변경    
+    version: v2  
+    app: myapp-bluegreen

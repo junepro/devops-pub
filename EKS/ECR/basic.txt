@@ -1,0 +1,22 @@
+aws configure
+AWS Access Key ID: ****
+AWS Secret Access Key: ****
+Default Region Name: us-east-1
+
+# Create ECR Repository
+aws ecr create-repository --repository-name aws-ecr-kubenginx --region us-east-1
+aws ecr create-repository --repository-name <your-repo-name> --region <your-region>
+
+# Build Docker Image
+docker build -t <ECR-REPOSITORY-URI>:<TAG> .
+docker build -t AWSaddress.dkr.ecr.us-east-1.amazonaws.com/aws-ecr-kubenginx:1.0.0 .
+
+# Get Login Password
+aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <ECR-REPOSITORY-URI>
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin AWSaddress.dkr.ecr.us-east-1.amazonaws.com/aws-ecr-kubenginx
+
+
+# Push the Docker Image
+docker push <ECR-REPOSITORY-URI>:<TAG>
+docker push AWSaddress.dkr.ecr.us-east-1.amazonaws.com/aws-ecr-kubenginx:1.0.0
