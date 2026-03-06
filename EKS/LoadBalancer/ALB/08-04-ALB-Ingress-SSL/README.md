@@ -37,7 +37,7 @@ description: Learn AWS Load Balancer Controller - Ingress SSL
 ```yaml
     ## SSL Settings
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:180789647333:certificate/632a3ff6-3f6d-464c-9121-b9d97481a76b
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:aws_account:certificate/632a3ff6-3f6d-464c-9121-b9d97481a76b
     #alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-1-2017-01 #Optional (Picks default if not used)    
 ```
 ## Step-05: Deploy all manifests and test

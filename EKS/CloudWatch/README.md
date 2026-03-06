@@ -9,7 +9,7 @@
 - Go to Services -> EC2 -> Worker Node EC2 Instance -> IAM Role -> Click on that role
 ```
 # Sample Role ARN
-arn:aws:iam::180789647333:role/eksctl-eksdemo1-nodegroup-eksdemo-NodeInstanceRole-1FVWZ2H3TMQ2M
+arn:aws:iam::aws_account:role/eksctl-eksdemo1-nodegroup-eksdemo-NodeInstanceRole-1FVWZ2H3TMQ2M
 
 # Policy to be associated
 Associate Policy: CloudWatchAgentServerPolicy
