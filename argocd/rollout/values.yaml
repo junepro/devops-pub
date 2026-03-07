@@ -1,0 +1,17 @@
+# 이름을 'argocd'와 'argo-rollouts'로 고정
+argo-cd:
+  fullnameOverride: "argocd"
+  server:
+    extensions:
+      enabled: true
+      extensionList:
+        - name: rollout-extension
+          env:
+            - name: EXTENSION_URL
+              value: https://github.com/argoproj-labs/rollout-extension/releases/download/v0.3.7/extension.tar
+
+argo-rollouts:
+  fullnameOverride: "argo-rollouts"
+  installCRDs: true  
+  dashboard:
+    enabled: false

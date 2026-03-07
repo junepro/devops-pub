@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-blue-green
+spec:
+  replicas: 5
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: rollouts-blue-green
+  template:
+    metadata:
+      labels:
+        app: rollouts-blue-green
+    spec:
+      containers:
+      - name: rollouts-blue-green
+        image: argoproj/rollouts-demo:blue # 여기서 태그만 yellow 등으로 변경하며 배포
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+  strategy:
+    blueGreen: 
+      # 현재 운영 트래픽을 받는 서비스 이름
+      activeService: rollouts-blue-green
+      # 신버전이 다 올라왔을 때 자동으로 트래픽을 넘길지 (false면 수동 승인 필요)
+      autoPromotionEnabled: false 
+      # 트래픽 전환 후 구버전 포드를 30초 동안 유지 (즉시 삭제 방지)
+      scaleDownDelaySeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollouts-blue-green # Rollout의 activeService 이름과 일치해야 함
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: rollouts-blue-green # Rollout의 spec.selector.matchLabels와 일치해야 함      

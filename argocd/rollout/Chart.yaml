@@ -1,0 +1,10 @@
+apiVersion: v2
+name: argocd-with-rollouts
+version: 1.0.0
+dependencies:
+  - name: argo-cd
+    version: "9.4.7" # 사용할 argo-cd 차트 버전
+    repository: "https://argoproj.github.io/argo-helm"
+  - name: argo-rollouts
+    version: "2.40.5" # 사용할 argo-rollouts 차트 버전
+    repository: "https://argoproj.github.io/argo-helm"
