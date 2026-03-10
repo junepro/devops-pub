@@ -50,7 +50,7 @@ Kserve,Kubeflow,Mlfow,Mcp,AgentAI 개발 공부도 진행중입니다.
 
 ##  개인 프로젝트 
 
-### 📊 mcp server & eks & slack
+### 📊 AI agent - MCP server 
 
 구조도
 
