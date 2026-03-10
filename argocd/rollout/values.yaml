@@ -14,4 +14,4 @@ argo-rollouts:
   fullnameOverride: "argo-rollouts"
   installCRDs: true  
   dashboard:
-    enabled: false
+    enabled: true

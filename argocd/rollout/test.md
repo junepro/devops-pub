@@ -5,6 +5,19 @@ helm install argocd-stack . -n argocd --create-namespace
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 
+# 1. 기존에 꼬여있을 수 있는 lock 파일과 charts 디렉토리 정리
+rm -rf charts/ Chart.lock
+
+# 2. Chart.yaml에 명시된 리포지토리로부터 차트 파일(.tgz) 다운로드
+helm dependency update
+
+# 3. 설치 진행
+helm upgrade --install argocd-stack . -n argocd
+
+# 4. 서비스 포트포워딩 (로컬에서 접속 확인용)
+kubectl port-forward svc/argo-rollouts-dashboard 3100:80 -n argocd
+
+
 # Argo CD 서버 포트를 로컬 8080으로 전달
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 
@@ -29,3 +42,4 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
     ArgoCD UI에서 해당 App의 Rollout 리소스를 클릭하고 "Promote" 버튼을 누르거나 아래 명령어를 입력하세요.
 
     kubectl argo rollouts promote canary-demo
+

@@ -38,6 +38,11 @@ Kserve,Kubeflow,Mlfow,Mcp,AgentAI 개발 공부도 진행중입니다.
 - 로그 수집, 적재, 모니터링 자동화 구현
 <img width="1920" height="1040" alt="cdc설계도" src="https://github.com/user-attachments/assets/9fb3998a-4d29-4313-8011-9b3d1b1ccfba" />
 
+ - onprmise k8s 환경 위 구축
+##
+
+![alt text](k8s.png)
+
 ### 📊 온프레미스 CI / CD  k8s 구축 
 - dev 환경을 온프레미스 자체 구축 작업진행
 <img width="1192" height="523" alt="image" src="https://github.com/user-attachments/assets/9e7e06f5-3011-448b-828f-000014c01703" />
@@ -46,7 +51,6 @@ Kserve,Kubeflow,Mlfow,Mcp,AgentAI 개발 공부도 진행중입니다.
 ##  개인 프로젝트 
 
 ### 📊 mcp server & eks & slack
-
 
 구조도
 
