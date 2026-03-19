@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rook-test-pod
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["/bin/sh", "-c", "sleep 36000"]
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: rook-rbd-pvc

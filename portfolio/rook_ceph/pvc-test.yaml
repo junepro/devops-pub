@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rook-rbd-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: rook-ceph-block-test
+  resources:
+    requests:
+      storage: 5Gi
