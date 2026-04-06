@@ -38,12 +38,12 @@ Kserve,Kubeflow,Mlfow,Mcp,AgentAI 개발 공부도 진행중입니다.
 - 로그 수집, 적재, 모니터링 자동화 구현
  - onprmise k8s 환경 위 구축
 ## 설계도
-![alt text](cdc설계도-1.png)
+![alt text](cdc.png)
 ![alt text](k8s.png)
 
 ### 📊 온프레미스 CI / CD  k8s 구축 
 - dev 환경을 온프레미스 자체 구축 작업진행
-![alt text](온프레미스.PNG)
+![alt text](onprem.PNG)
 
 
 ##  개인 프로젝트 
